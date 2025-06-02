@@ -5,10 +5,41 @@
 
 WorkerManager::WorkerManager()
 {
-	// 初始化属性
-	this->m_EmpArray = NULL;
+    //文件不存在
+    ifstream ifs;
+	ifs.open(FILENAME, ios::in); // 打开文件进行读取
+    if (!ifs.is_open())
+    {
+        //初始化属性
+        this->m_EmpNum = 0;
+        this->m_EmpArray = NULL;
+		//初始化文件是否存在
+		this->m_FileIsEmpty = true; // 文件为空
+        ifs.close();
+		return; // 直接返回，不需要继续执行
+    }
 
-	this->m_EmpNum = 0;
+	//文件存在为空
+    char ch;
+    ifs >> ch; // 读取第一个字符
+    if (ifs.eof()) // 如果文件为空
+    {
+        //初始化属性
+        this->m_EmpNum = 0;
+        this->m_EmpArray = NULL;
+        //初始化文件是否存在
+        this->m_FileIsEmpty = true; // 文件为空
+        ifs.close();
+        return; // 直接返回，不需要继续执行
+    }
+	
+	// 文件不为空
+    int num = this->get_EmpNum();
+	this->m_EmpNum = num; // 获取职工人数
+
+    //开辟空间
+	this->m_EmpArray = new Worker * [this->m_EmpNum]; // 动态分配职工数组空间
+	this->init_Emp(); // 初始化职工信息
 
 }
 
@@ -114,14 +145,103 @@ void WorkerManager::Add_Emp()
         // 更新职工人数  
         this->m_EmpNum = newSize;  
 
+        //成功添加后保存到文件中
+        this->save();
+
+		// 输出添加成功信息
+        this->m_FileIsEmpty = false;
         cout << "成功添加" << addNum << "名新职工" << endl;  
+
+
+
     }  
     else  
     {  
         cout << "输入有误" << endl;  
     }  
 }
-WorkerManager::~WorkerManager()
+
+void WorkerManager::save()
 {
+    ofstream ofs;
+	ofs.open(FILENAME, ios::out);// 打开文件进行写入
+
+	// 写入职工信息
+    for (int i = 0; i < this->m_EmpNum; i++)
+    {
+        ofs<< this->m_EmpArray[i]->m_id << " "
+            << this->m_EmpArray[i]->m_name << " "
+			<< this->m_EmpArray[i]->m_deptId << endl;
+    }
+
+	// 关闭文件
+    ofs.close();
+}
+
+//统计职工人数
+int WorkerManager::get_EmpNum()
+{
+    ifstream ifs;
+	ifs.open(FILENAME, ios::in); // 打开文件进行读取
+
+    int id;
+    string name;
+    int dId;
+    
+    int num = 0;
+
+    while (ifs >> id && ifs >> name && ifs >> dId)
+    {
+        num++;
+    }
+    return num; // 返回职工人数
+}
+
+//初始化员工
+void WorkerManager::init_Emp()
+{
+    ifstream ifs;
+	ifs.open(FILENAME, ios::in); // 打开文件进行读取
+
+    int id;
+    string name;
+    int dId;
+	int index = 0; // 用于记录职工数组的索引
+
+    while (ifs >> id && ifs >> name && ifs >> dId)
+    {
+		Worker* worker = NULL; // 创建一个职工对象指针
+        switch (dId)
+        {
+        case 1: // 普通职工
+            worker = new Employee(id, name, dId);
+            break;
+        case 2: // 经理
+            worker = new Manager(id, name, dId);
+            break;
+        case 3: // 老板
+            worker = new Boss(id, name, dId);
+            break;
+        default:
+            cout << "输入有误，请重新输入" << endl;
+            continue; // 跳过本次循环
+		}
+		this->m_EmpArray[index] = worker; // 将职工对象存入数组
+        index++;
+    }
+	// 关闭文件
+	ifs.close();
 
 }
+
+//析构函数
+WorkerManager::~WorkerManager()
+{
+    if (m_EmpArray != NULL)
+    {
+        delete[] m_EmpArray; // 释放职工数组空间
+		this->m_EmpArray = NULL; // 避免悬空指针
+    }
+}
+
+
