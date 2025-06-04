@@ -40,6 +40,24 @@ public:
 	//初始化职工
 	void init_Emp();
 
+	//显示职工信息
+	void Show_Emp();
+
+	//判断职工是否存在
+	int IsExist(int id);
+
+	//删除职工
+	void Del_Emp();
+
+	//修改职工信息
+	void Mod_Emp();
+
+	//查找职工信息
+	void Find_Emp();
+
+	//排序职工信息
+	void Sort_Emp();
+
 	//析构函数
 	~WorkerManager();
 };
