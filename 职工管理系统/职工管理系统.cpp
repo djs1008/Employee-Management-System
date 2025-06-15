@@ -41,9 +41,9 @@ int main()
 		case 6: //排序职工
 			wm.Sort_Emp();
 			break;
-		//case 7: //清空文件
-		//	wm.Clean_File();
-		//	break;
+		case 7: //清空文件
+			wm.Clean_File();
+			break;
 		default:
 			cout << "输入错误，请重新输入！" << endl;
 			system("pause");

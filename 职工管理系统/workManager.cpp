@@ -16,7 +16,6 @@ WorkerManager::WorkerManager()
 		//初始化文件是否存在
 		this->m_FileIsEmpty = true; // 文件为空
         ifs.close();
-		return; // 直接返回，不需要继续执行
     }
 
 	//文件存在为空
@@ -30,7 +29,6 @@ WorkerManager::WorkerManager()
         //初始化文件是否存在
         this->m_FileIsEmpty = true; // 文件为空
         ifs.close();
-        return; // 直接返回，不需要继续执行
     }
 	
 	// 文件不为空
@@ -134,6 +132,7 @@ void WorkerManager::Add_Emp()
                 delete worker;  
                 break;  
             }  
+            
         }  
 
         // 释放原有空间  
@@ -160,6 +159,8 @@ void WorkerManager::Add_Emp()
     {  
         cout << "输入有误" << endl;  
     }  
+    system("pause"); // 暂停屏幕
+    system("cls"); // 清屏
 }
 
 void WorkerManager::save()
@@ -241,7 +242,6 @@ void WorkerManager::Show_Emp()
     if (this->m_FileIsEmpty)
     {
 		cout << "文件不存在或文件为空" << endl;
-		return; // 直接返回，不需要继续执行
     }
     else
     {
@@ -298,7 +298,6 @@ void WorkerManager::Del_Emp()
         else // 如果职工不存在
         {
             cout << "职工不存在，删除失败" << endl;
-            return; // 直接返回，不需要继续执行
 		}
 		system("pause"); // 暂停屏幕
 		system("cls"); // 清屏
@@ -311,7 +310,6 @@ void WorkerManager::Mod_Emp()
     if (this->m_FileIsEmpty)
     {
 		cout << "文件不存在或文件为空，无法修改" << endl;
-        return;
     }
     else
     {
@@ -361,7 +359,6 @@ void WorkerManager::Mod_Emp()
             // 如果职工不存在
         {
             cout << "职工不存在，修改失败" << endl;
-            return; // 直接返回，不需要继续执行
         }
     }
 	system("pause"); // 暂停屏幕
@@ -531,11 +528,61 @@ void WorkerManager::Sort_Emp()
     }
 }
 
+//清空职工信息
+void WorkerManager::Clean_File()
+{
+	cout << "确认清空所有职工信息吗？" << endl;
+	cout << "1.确认" << endl;
+	cout << "2.取消" << endl;
+	int select = 0;
+	cin >> select;
+    if (select == 1)
+    {
+        //清空文件
+		ofstream ofs(FILENAME, ios::trunc);// 清除文件后重新创建
+		ofs.close(); // 关闭文件
+        if (this->m_EmpArray != NULL)
+        {
+            for (int i = 0; i < this->m_EmpNum; i++)
+            {
+                if (this->m_EmpArray[i] != NULL)
+                {
+                    delete this->m_EmpArray[i]; // 释放每个职工对象的内存空间
+                    this->m_EmpArray[i] = NULL; // 避免悬空指针
+                }
+            }
+            delete[] m_EmpArray; // 释放职工数组空间
+            this->m_EmpArray = NULL; // 避免悬空指针
+			this->m_EmpNum = 0; // 职工人数归零
+            this->m_FileIsEmpty = true; // 文件为空
+            cout << "清空成功" << endl;
+        }
+        else
+        {
+			cout << "文件已清空" << endl;
+        }
+    }
+    else if (select == 2)
+    {
+		cout << "取消清空操作" << endl;
+    }
+    system("pause"); // 暂停屏幕
+    system("cls"); // 清屏
+}
+
 //析构函数
 WorkerManager::~WorkerManager()
 {
-    if (m_EmpArray != NULL)
+    if (this->m_EmpArray != NULL)
     {
+        for(int i=0; i < this->m_EmpNum; i++)
+        {
+            if (this->m_EmpArray[i] != NULL)
+            {
+                delete this->m_EmpArray[i]; // 释放每个职工对象的内存空间
+                this->m_EmpArray[i] = NULL; // 避免悬空指针
+            }
+		}
         delete[] m_EmpArray; // 释放职工数组空间
 		this->m_EmpArray = NULL; // 避免悬空指针
     }
